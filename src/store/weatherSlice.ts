@@ -35,7 +35,7 @@ export const fetchWeather = createAsyncThunk<
 	if (response.status !== 200) {
 		return rejectWithValue('Server Error!')
 	}
-	
+
 	const {
 		location: { region, localtime },
 		current: {
@@ -47,8 +47,6 @@ export const fetchWeather = createAsyncThunk<
 			condition: { text, icon },
 		},
 	} = response.data
-
-	console.log(response.data)
 
 	return {
 		location: region,
