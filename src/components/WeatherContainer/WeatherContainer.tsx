@@ -11,12 +11,17 @@ const WeatherContainer = () => {
 
 	return (
 		<WeatherContainerWrapper>
-			{loading && <h2>Loading...</h2>}
-			{error && <h2>Error: {error}</h2>}
-
-			<Location />
-			<Weather />
-			<WeatherDetails />
+			{loading ? (
+				<h2>Loading...</h2>
+			) : error ? (
+				<h2>Error: {error}</h2>
+			) : (
+				<>
+					<Location />
+					<Weather />
+					<WeatherDetails />
+				</>
+			)}
 		</WeatherContainerWrapper>
 	)
 }
