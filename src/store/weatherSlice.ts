@@ -29,11 +29,13 @@ export const fetchWeather = createAsyncThunk<
 	{ rejectValue: string }
 >('weather/fetchWeather', async function (_, { rejectWithValue }) {
 	const response = await axios.get(
-		'http://api.weatherapi.com/v1/current.json?key=ce5873f95fb84efab81122156230805&q=London'
+		'https://api.weatherapi.com/v1/current.json?key=ce5873f95fb84efab81122156230805&q=London'
 	)
-	if (response.statusText !== 'OK') {
+
+	if (response.status !== 200) {
 		return rejectWithValue('Server Error!')
 	}
+	
 	const {
 		location: { region, localtime },
 		current: {
