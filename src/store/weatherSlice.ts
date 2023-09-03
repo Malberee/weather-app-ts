@@ -1,7 +1,12 @@
 import axios from 'axios'
 import { format } from 'date-fns'
 
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import {
+	createSlice,
+	createAsyncThunk,
+	AnyAction,
+	PayloadAction,
+} from '@reduxjs/toolkit'
 
 type Weather = {
 	location: string
@@ -28,39 +33,39 @@ export const fetchWeather = createAsyncThunk<
 	undefined,
 	{ rejectValue: string }
 >('weather/fetchWeather', async function (_, { rejectWithValue }) {
-		const response = await axios.get(
-			'https://api.weatherapi.com/v1/current.json?key=ce5873f95fb84efab81122156230805&q=London'
-		)
+	const response = await axios.get(
+		'https://api.weatherapi.com/v1/current.json?key=ce5873f95fb84efab81122156230805&q=London'
+	)
 
-		if (response.status !== 200) {
-			return rejectWithValue('Server Error!')
-		}
+	if (response.status !== 200) {
+		return rejectWithValue('Server Error!')
+	}
 
-		const {
-			location: { region, localtime },
-			current: {
-				temp_c,
-				vis_km,
-				humidity,
-				feelslike_c,
-				wind_kph,
-				condition: { text, icon },
-			},
-		} = response.data
+	const {
+		location: { region, localtime },
+		current: {
+			temp_c,
+			vis_km,
+			humidity,
+			feelslike_c,
+			wind_kph,
+			condition: { text, icon },
+		},
+	} = response.data
 
-		return {
-			location: region,
-			date: format(new Date(localtime), 'eeee dd/MM/yyyy'),
-			temperature: temp_c,
-			weatherText: text,
-			icon: icon,
-			details: {
-				visibility: vis_km,
-				humidity: humidity,
-				feelsLike: feelslike_c,
-				wind: wind_kph,
-			},
-		} as Weather
+	return {
+		location: region,
+		date: format(new Date(localtime), 'eeee dd/MM/yyyy'),
+		temperature: temp_c,
+		weatherText: text,
+		icon: icon,
+		details: {
+			visibility: vis_km,
+			humidity: humidity,
+			feelsLike: feelslike_c,
+			wind: wind_kph,
+		},
+	} as Weather
 })
 
 const initialState: WeatherState = {
@@ -95,12 +100,15 @@ const weatherSlice = createSlice({
 				state.weather = action.payload
 				state.loading = false
 			})
-			.addCase(fetchWeather.rejected, (state, action) => {
-				console.log(action)
+			.addMatcher(isError, (state, action: PayloadAction<string>) => {
 				state.loading = false
-				state.error = action.error.message
+				state.error = action.payload
 			})
 	},
 })
+
+function isError(action: AnyAction) {
+	return action.type.endsWith('rejected')
+}
 
 export default weatherSlice.reducer
